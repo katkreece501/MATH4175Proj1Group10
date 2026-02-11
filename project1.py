@@ -14,15 +14,11 @@ def division_algorithm(a: int, b: int):
     while (v[2] > 0):
         print(u[0], v[0], u[1], v[1], u[2], v[2], q)
         q = u[2] // v[2]
-        old_u[0] = u[0]
-        old_u[1] = u[1]
-        old_u[2] = u[2]
-        u[0] = v[0]
-        u[1] = v[1]
-        u[2] = v[2]
-        v[0] = old_u[0] - (q * v[0])
-        v[1] = old_u[1] - (q * v[1])
-        v[2] = old_u[2] - (q * v[2])
+        
+        for i in range(3):
+            old_u[i] = u[i]
+            u[i] = v[i]
+            v[i] = old_u[i] - (q * v[i])
 
     print(u[0], v[0], u[1], v[1], u[2], v[2], q)
     print("x = ", u[0])
