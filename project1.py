@@ -1,7 +1,11 @@
+#python3 -m pip install tabulate
+from tabulate import tabulate
+
 # Participating students: 
 # Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
 
 def division_algorithm(a: int, b: int):
+   
     # Defining starting values of the u, v, and q with lists
     u = [1, 0, a]
     v = [0, 1, b]
@@ -9,10 +13,11 @@ def division_algorithm(a: int, b: int):
     # We'll need to store the old values of the u variables to update the v variables
     old_u = [1, 2, 3]
 
-    # Print statements would be replaced by the file print outs in the final program
-    print("For a =", a, " and b = ", b)
+    table = []
+
     while (v[2] > 0):
-        print(u[0], v[0], u[1], v[1], u[2], v[2], q)
+        
+        table.append([u[0], v[0], u[1], v[1], u[2], v[2], q])
         q = u[2] // v[2]
         
         for i in range(3):
@@ -20,11 +25,22 @@ def division_algorithm(a: int, b: int):
             u[i] = v[i]
             v[i] = old_u[i] - (q * v[i])
 
-    print(u[0], v[0], u[1], v[1], u[2], v[2], q)
-    print("x = ", u[0])
-    print("y = ", u[1])
-    print("gcd = ", u[2])
-    print()
+    
+
+    table.append([u[0], v[0], u[1], v[1], u[2], v[2], q])
+
+    #Open textfile and write table information to it
+    with open("DivisionOutput.txt", "a") as textFile:
+        textFile.write(f"For a = {a} and b = {b} \n\n")
+
+        textFile.write(
+            tabulate(table, headers=["u1","v1","u2","v2","u3","v3","q"]))   
+            
+        textFile.write(f"\n\nx = {u[0]} \n")
+
+        textFile.write(f"y =  {u[1]} \n")
+
+        textFile.write(f"gcd = {u[2]} \n\n")
 
 def main():
     division_algorithm(768336, 78192)
