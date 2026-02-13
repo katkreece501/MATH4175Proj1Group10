@@ -29,7 +29,7 @@ def division_algorithm(a: int, b: int):
     #Open textfile and write table information to it
     with open("DivisionOutput.txt", "a") as textFile:
         textFile.write(f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-        
+
         textFile.write(f"For a = {a} and b = {b}\n\n")
 
         textFile.write(
@@ -42,7 +42,7 @@ def division_algorithm(a: int, b: int):
         textFile.write(f"gcd = {u[2]}\n")
 
 def main():
-    # Adding our names to top of file for credit
+    # Adding our names and project title
     with open("DivisionOutput.txt", "a") as textFile:
         textFile.write(f"Project 1: Cryptography MATH 4175\n")
         textFile.write(f"Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran\n")
