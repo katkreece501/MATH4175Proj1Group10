@@ -14,7 +14,7 @@ def division_algorithm(a: int, b: int):
 
     table = []
 
-    # Main algorithm loop. Runs until v2 <= 0.
+    # Main algorithm loop. Runs until v3 <= 0.
     while (v[2] > 0):
         table.append([u[0], v[0], u[1], v[1], u[2], v[2], q])
         q = u[2] // v[2]
