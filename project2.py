@@ -222,7 +222,7 @@ def main():
     with open("VigenereDecryption.txt", "a") as textFile:
         textFile.write(f"{explanation}\n\n")
 
-    dotTable = computeDotProductTable(substrings7)  # Step 1: compute all dot products
+    dotTable = computeDotProductTable(substrings7)  
     outputDotProductTable(dotTable)  
 if __name__ == "__main__":
     main()
