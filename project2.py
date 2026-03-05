@@ -1,3 +1,4 @@
+from collections import deque
 # Participating students:
 # Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
 
@@ -75,6 +76,96 @@ def outputSubstringsIOC(substrings: dict, iOC: list, m: int):
             textFile.write(f"Index of Coincidence for y{num}: {iOC[num - 1]}\n\n")
         textFile.write(f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
+# Converts a substring into a frequency vector
+def frequencyVector(string : str):
+    # Count occurrences of each letter
+    counts = [0] * 26
+
+    for char in string:
+        # Convert letter to number 0-25
+        index = ord(char) - ord('A')   
+        counts[index] += 1
+
+    lengthOfSubstring = len(string)
+
+    # Convert counts into probabilities
+    freqVector = []
+    for count in counts:
+        freqVector.append(count / lengthOfSubstring)
+
+    return freqVector
+
+#shift frequency vector by n amount
+def shiftFrequencyVector(freqVector : list, shiftAmount : int):
+    freqVectorDeque = deque(freqVector)
+    freqVectorDeque.rotate(-shiftAmount)
+    return list(freqVectorDeque)
+
+#computing the dot products for the 26 vectors 
+def computeDotProducts(freqVector: list):
+    englishFreq = [
+        0.082, 0.015, 0.028, 0.043, 0.127, 0.022,
+        0.020, 0.061, 0.070, 0.002, 0.008, 0.040,
+        0.024, 0.067, 0.075, 0.019, 0.001, 0.060,
+        0.063, 0.091, 0.028, 0.010, 0.023, 0.001,
+        0.020, 0.001
+    ]
+
+    #compute all dot products and store here 
+    dotProducts = []
+
+    for shift in range(26):
+        freqVectorShifted = shiftFrequencyVector(freqVector, shift)
+
+        dot = 0
+        for j in range(len(englishFreq)):
+            dot += freqVectorShifted[j] * englishFreq[j]
+
+        #multiply by 100 to make it look cleaner 
+        dotProducts.append(dot * 100)
+
+    return dotProducts
+
+# Computes the dot products for all 7 substrings
+def computeDotProductTable(substrings: dict):
+
+    table = {}
+
+    # Iterate over each substring
+    for num, substr in substrings.items():
+        # Convert substring to frequency vector
+        freqVec = frequencyVector(substr)
+        # Compute dot products for all 26  shifts
+        dots = computeDotProducts(freqVec)
+        # Store in table under substring number
+        table[num] = dots
+
+    return table
+
+
+# Outputs the dot product table to the text file
+def outputDotProductTable(table: dict):
+   
+    with open("VigenereDecryption.txt", "a") as textFile:
+        textFile.write("Dot Product Table (rows = shifts 0-25)\n\n")
+
+        # Iterate through each shift
+        for shift in range(26):
+            row = []
+            # Collect dot products for this shift from all 7 substrings
+            for col in range(1, 8):
+                # Format each dot product to 3 decimal places
+                row.append(f"{table[col][shift]:.3f}")
+
+            # Write the row to file
+            textFile.write(f"{shift:2}: " + "  ".join(row) + "\n")
+
+        textFile.write("\n")
+   
+
+    
+
+
 
 def main():
     # Open file, and add names
@@ -131,5 +222,7 @@ def main():
     with open("VigenereDecryption.txt", "a") as textFile:
         textFile.write(f"{explanation}\n\n")
 
+    dotTable = computeDotProductTable(substrings7)  # Step 1: compute all dot products
+    outputDotProductTable(dotTable)  
 if __name__ == "__main__":
     main()
