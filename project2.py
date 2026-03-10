@@ -163,6 +163,23 @@ def outputDotProductTable(table: dict):
         textFile.write("\n")
    
 
+# Decrypts a given ciphertext using the Vigenère cipher decryption formula and a given keyword
+def decryptVigenere(ciphertext: str, keyword: str):
+    decryptedText = ""
+    keywordLength = len(keyword)
+
+    for i, char in enumerate(ciphertext):
+        # Convert character and corresponding keyword character to numbers 0-25
+        charIndex = ord(char) - ord('A')
+        keyIndex = ord(keyword[i % keywordLength]) - ord('A')
+
+        # Decrypt character using Vigenère decryption formula
+        decryptedCharIndex = (charIndex - keyIndex) % 26
+        decryptedChar = chr(decryptedCharIndex + ord('A'))
+
+        decryptedText += decryptedChar
+
+    return decryptedText
     
 
 
@@ -222,7 +239,13 @@ def main():
     with open("VigenereDecryption.txt", "a") as textFile:
         textFile.write(f"{explanation}\n\n")
 
-    dotTable = computeDotProductTable(substrings7)  
-    outputDotProductTable(dotTable)  
+    dotTable = computeDotProductTable(substrings7)
+    outputDotProductTable(dotTable)
+
+    # Keyword gotten from columns
+    keyword = "SWIRLED"
+    decryptedText = decryptVigenere(ciphertext, keyword)
+    with open("VigenereDecryption.txt", "a") as textFile:
+        textFile.write(f"Decrypted Text:\n{decryptedText}\n")
 if __name__ == "__main__":
     main()
