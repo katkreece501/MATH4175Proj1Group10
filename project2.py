@@ -1,4 +1,7 @@
+#python3 -m pip install wordsegment
 from collections import deque
+from wordsegment import load, segment
+
 # Participating students:
 # Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
 
@@ -142,7 +145,6 @@ def computeDotProductTable(substrings: dict):
 
     return table
 
-
 # Outputs the dot product table to the text file
 def outputDotProductTable(table: dict):
    
@@ -162,7 +164,6 @@ def outputDotProductTable(table: dict):
 
         textFile.write("\n")
    
-
 # Decrypts a given ciphertext using the Vigenère cipher decryption formula and a given keyword
 def decryptVigenere(ciphertext: str, keyword: str):
     decryptedText = ""
@@ -180,10 +181,14 @@ def decryptVigenere(ciphertext: str, keyword: str):
         decryptedText += decryptedChar
 
     return decryptedText
+
+# Takes the raw decrypted text and formats it with spaces from the wordsegment library
+def formatWithSpaces(rawText):
+    load()
+    words = segment(rawText)
+    result = " ".join(words).capitalize()
+    return result
     
-
-
-
 def main():
     # Open file, and add names
     with open("VigenereDecryption.txt", "w") as textFile:
@@ -246,6 +251,36 @@ def main():
     keyword = "SWIRLED"
     decryptedText = decryptVigenere(ciphertext, keyword)
     with open("VigenereDecryption.txt", "a") as textFile:
-        textFile.write(f"Decrypted Text:\n{decryptedText}\n")
+        textFile.write(f"Decrypted Text:\n{decryptedText}\n\n")
+    
+    # Write final decryption to the file formatted with spaces and punctuation
+    # 1. Add spaces to the decryption
+    formattedDecryption = formatWithSpaces(decryptedText)
+    
+    # 2. Add punctuation to the decryption
+    replacements = [
+        ("whom we serve in recent months", "whom we serve. In recent months,"),
+        ("however we have", "however, we have"),
+        ("to their data as a result", "to their data. As a result,"),
+        ("issued by a federal judge for example", "issued by a federal judge. For example,"),
+        ("end user this applies", "end user. This applies"),
+        ("an electronic device if the", "an electronic device. If the"),
+        ("any third party we do not have any silver bullets and", "any third party. We do not have any silver bullets, and"),
+        ("are still ongoing while", "are still ongoing. While"),
+        ("seek legislation we must", "seek legislation, we must"),
+        ("congress industry academics privacy groups and others", "Congress, industry, academics, privacy groups, and others"),
+        ("so much debate but", "so much debate. But"),
+        ("ongoing honest and informed", "ongoing, honest, and informed"),
+    ]
+
+    for old, new in replacements:
+        formattedDecryption = formattedDecryption.replace(old, new)
+
+    if not formattedDecryption.endswith("."):
+        formattedDecryption += "."
+
+    with open("VigenereDecryption.txt", "a") as textFile:
+        textFile.write(f"Decrypted Text Formatted with Spaces and Punctuation:\n{formattedDecryption}\n")
+    
 if __name__ == "__main__":
     main()
