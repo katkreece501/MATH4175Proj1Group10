@@ -59,16 +59,6 @@ def indexOfCoincidence(substrings: dict, m: int):
 
 # Outputs substrings and corresponding indices of coincidence to the output file
 def outputSubstringsIOC(substrings: dict, iOC: list, m: int):
-    explanation = (
-        "Our outputs verify that m = 7 is the correct guess for the length of the keyword. For m = 6 and m = 8, "
-        "the indices of coincidence for each substring are all somewhat close to 0.038, which is the expected "
-        "index of coincidence for a completely random substring. By contrast, for m = 7, all the substrings have "
-        "indices of coincidence that are close to or exceeding 0.065, which would be the index of coincidence for a "
-        "substring with letter frequencies approaching those of the English language as a whole. Thus, this indicates "
-        "that each of the substrings for m = 7 is likely to be a ciphertext encrypted with the same key, which would be "
-        "expected for a ciphertext encrypted with the Vigenère cipher with a keyword of length 7."
-    )
-
     with open("VigenereDecryption.txt", "a") as textFile:
         textFile.write(f"For m = {m}:\n")
         # Iterate through each substring
@@ -104,7 +94,8 @@ def shiftFrequencyVector(freqVector : list, shiftAmount : int):
     freqVectorDeque.rotate(-shiftAmount)
     return list(freqVectorDeque)
 
-#computing the dot products for the 26 vectors 
+# Computing the dot products for the 26 vectors 
+# Tracks which shift produces the highest dot product, which will correspond to a character in the key word
 def computeDotProducts(freqVector: list):
     englishFreq = [
         0.082, 0.015, 0.028, 0.043, 0.127, 0.022,
@@ -117,33 +108,47 @@ def computeDotProducts(freqVector: list):
     #compute all dot products and store here 
     dotProducts = []
 
+    # To track which shift produces the highest dot product
+    highestShift = -1
+    highestDot = -1
     for shift in range(26):
         freqVectorShifted = shiftFrequencyVector(freqVector, shift)
 
+        # Compute dot product
         dot = 0
         for j in range(len(englishFreq)):
             dot += freqVectorShifted[j] * englishFreq[j]
 
-        #multiply by 100 to make it look cleaner 
+        # Update highestDot/highestShift if needed
+        if dot > highestDot:
+            highestDot = dot
+            highestShift = shift
+
+        # Multiply by 100 to make it look cleaner
         dotProducts.append(dot * 100)
 
-    return dotProducts
+    return dotProducts, highestShift
 
-# Computes the dot products for all 7 substrings
-def computeDotProductTable(substrings: dict):
+# Computes the dot products for all 7 substrings, along with the keyword
+def computeDotProductTableKeyword(substrings: dict):
 
     table = {}
+    keyword = ""
+    numToLetter = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J', 10: 'K', 11: 'L', 12: 'M',
+                   13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T', 20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y', 25: 'Z'}
 
     # Iterate over each substring
     for num, substr in substrings.items():
         # Convert substring to frequency vector
         freqVec = frequencyVector(substr)
         # Compute dot products for all 26  shifts
-        dots = computeDotProducts(freqVec)
+        dots, charNum = computeDotProducts(freqVec)
         # Store in table under substring number
         table[num] = dots
+        # Get the corresponding character to the highest shift for the keyword
+        keyword += numToLetter[charNum]
 
-    return table
+    return table, keyword
 
 # Outputs the dot product table to the text file
 def outputDotProductTable(table: dict):
@@ -244,13 +249,13 @@ def main():
     with open("VigenereDecryption.txt", "a") as textFile:
         textFile.write(f"{explanation}\n\n")
 
-    dotTable = computeDotProductTable(substrings7)
+    dotTable, keyword = computeDotProductTableKeyword(substrings7)
     outputDotProductTable(dotTable)
 
     # Keyword gotten from columns
-    keyword = "SWIRLED"
     decryptedText = decryptVigenere(ciphertext, keyword)
     with open("VigenereDecryption.txt", "a") as textFile:
+        textFile.write(f"From the table, the keyword is {keyword}\n\n")
         textFile.write(f"Decrypted Text:\n{decryptedText}\n\n")
     
     # Write final decryption to the file formatted with spaces and punctuation

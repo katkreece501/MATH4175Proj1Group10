@@ -91,7 +91,7 @@ JFIULQSFAMWZIWGDMVEHVVEIJNZVVAMVPEFUBVEDXJWNBFFVUWAMGZXYWAUZQLHLPCETHQAOVZZIQGKB
 Index of Coincidence for y8: 0.04131961456802221
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Our outputs verify that m = 7 is the correct guess for the length of the keyword. For m = 6 and m = 8, the indices of coincidence for each substring are all somewhat close to 0.038, which is the expected index of coincidence for a completely random substring. By contrast, for m = 7, all the substrings have indices of coincidence that are close to or exceeding 0.065, which would be the index of coincidence for a substring with letter frequencies approaching those of the English language as a whole. Thus, this indicates that each of the substrings for m = 7 is likely to be a ciphertext encrypted with the same key, which would be expected for a ciphertext encrypted with the Vigenère cipher with a keyword of length 7.
+Our outputs verify that m = 7 is the correct guess for the length of the keyword. For m = 6 and m = 8, the indices of coincidence for each substring are all somewhat close to 0.038, which is the expected index of coincidence for a completely random substring. By contrast, for m = 7, all the substrings have indices of coincidence that are close to or exceeding 0.065, which would be the index of coincidence for a substring with letter frequencies approaching those of the English language as a whole. Thus, this indicates that each of the substrings for m = 7 is likely to be a ciphertext encrypted with the same key, which would be expected for a ciphertext encrypted with the VigenÃ¨re cipher with a keyword of length 7.
 
 Dot Product Table (rows = shifts 0-25)
 
@@ -121,6 +121,8 @@ Dot Product Table (rows = shifts 0-25)
 23: 2.976  4.167  4.396  3.369  3.907  3.522  4.042
 24: 3.503  3.106  3.760  3.701  4.293  3.581  3.535
 25: 3.619  3.371  3.337  3.393  3.842  3.346  4.123
+
+From the table, the keyword is SWIRLED
 
 Decrypted Text:
 THEDEPARTMENTOFJUSTICEHASBEENANDWILLALWAYSBECOMMITTEDTOPROTECTINGTHELIBERTYANDSECURITYOFTHOSEWHOMWESERVEINRECENTMONTHSHOWEVERWEHAVEONANEWSCALESEENMAINSTREAMPRODUCTSANDSERVICESDESIGNEDINAWAYTHATGIVESUSERSSOLECONTROLOVERACCESSTOTHEIRDATAASARESULTLAWENFORCEMENTISSOMETIMESUNABLETORECOVERTHECONTENTOFELECTRONICCOMMUNICATIONSFROMTHETECHNOLOGYPROVIDEREVENINRESPONSETOACOURTORDERORDULYAUTHORIZEDWARRANTISSUEDBYAFEDERALJUDGEFOREXAMPLEMANYCOMMUNICATIONSSERVICESNOWENCRYPTCERTAINCOMMUNICATIONSBYDEFAULTWITHTHEKEYNECESSARYTODECRYPTTHECOMMUNICATIONSSOLELYINTHEHANDSOFTHEENDUSERTHISAPPLIESBOTHWHENTHEDATAISINMOTIONOVERELECTRONICNETWORKSORATRESTONANELECTRONICDEVICEIFTHECOMMUNICATIONSPROVIDERISSERVEDWITHAWARRANTSEEKINGTHOSECOMMUNICATIONSTHEPROVIDERCANNOTPROVIDETHEDATABECAUSEITHASDESIGNEDTHETECHNOLOGYSUCHTHATITCANNOTBEACCESSEDBYANYTHIRDPARTYWEDONOTHAVEANYSILVERBULLETSANDTHEDISCUSSIONSWITHINTHEEXECUTIVEBRANCHARESTILLONGOINGWHILETHEREHASNOTYETBEENADECISIONWHETHERTOSEEKLEGISLATIONWEMUSTWORKWITHCONGRESSINDUSTRYACADEMICSPRIVACYGROUPSANDOTHERSTOCRAFTANAPPROACHTHATADDRESSESALLOFTHEMULTIPLECOMPETINGCONCERNSTHATHAVEBEENTHEFOCUSOFSOMUCHDEBATEBUTWECANALLAGREETHATWEWILLNEEDONGOINGHONESTANDINFORMEDPUBLICDEBATEABOUTHOWBESTTOPROTECTLIBERTYANDSECURITYINBOTHOURLAWSANDOURTECHNOLOGY
