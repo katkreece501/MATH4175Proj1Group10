@@ -23,6 +23,27 @@ Rows: Input Sums, Columns: Output Sums
 |                      6 |   0 |   0 |   0 |   0 |  -4 |   0 |   0 |   0 |
 +------------------------+-----+-----+-----+-----+-----+-----+-----+-----+
 |                      7 |   0 |   2 |  -2 |   0 |   0 |   2 |   2 |   0 |
-+------------------------+-----+-----+-----+-----+-----+-----+-----+-----+
++------------------------+-----+-----+-----+-----+-----+-----+-----+-----+Based on the table, we chose a path starting with the input sum of 110 and an output sum of 100 . A visualization of this path is attached.
+
 
 Total Bias: -0.5
+
+Subkey Guesses and Corresponding Counter Values:
+  000: 6
+  001: 2
+  010: 0
+  011: 4
+  100: 4
+  101: 2
+  110: 2
+  111: 4
+
+Subkey Guesses and Normalized distance from tau/2:
+  000: 3.0
+  001: 1.0
+  010: 3.0
+  011: 1.0
+  100: 1.0
+  101: 1.0
+  110: 1.0
+  111: 1.0
