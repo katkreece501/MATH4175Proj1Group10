@@ -47,3 +47,5 @@ Subkey Guesses and Normalized distance from tau/2:
   101: 1.0
   110: 1.0
   111: 1.0
+
+The largest normalized distances occur for the key guesses 000 and 010. Since both of these keys share the same first and third bits, we conclude that the first and third bits of the subkey are both 0. The linear approximation used in the attack depends only on the bit H_1, so changing the second bit of the key does not affect the value of the linear expression. This information is insufficient to determine the second bit, because both 000 and 010 produce the same bias, meaning the linear equation doesn't depend on the middle bit.
