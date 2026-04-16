@@ -1,5 +1,6 @@
 # python3 -m pip install tabulate
 from tabulate import tabulate
+from fractions import Fraction
 
 # Participating students:
 # Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
@@ -48,6 +49,30 @@ def main():
         f.write("Part 1: Difference Distribution Table (ND(a',b'))\n")
         f.write("Rows: Input Difference, Columns: Output Difference\n\n")
         f.write(table_string)
+
+    # Propagation Ratios for the three trails
+    # Each ratio is the product of (DDT count / 8) for each active S-box in the trail
+
+    # Trail Tr1 (P6 -> H6): S12(001->001), S22(001->001)
+    R1 = (ddt_table[1][1] / 8) * (ddt_table[1][1] / 8)
+
+    # Trail Tr2 (P6 -> H5,H6): S12(001->011), S21(001->001), S22(001->001)
+    R2 = (ddt_table[1][3] / 8) * (ddt_table[1][1] / 8) * (ddt_table[1][1] / 8)
+
+    # Trail Tr3 (P6 -> H4,H5,H6): S12(001->011), S21(001->011), S22(001->001)
+    R3 = (ddt_table[1][3] / 8) * (ddt_table[1][3] / 8) * (ddt_table[1][1] / 8)
+
+    # Append results to output file
+    with open("Project4.txt", "a") as f:
+        f.write("\n\nParts 2 & 3: Propagation Ratios\n\n")
+        ratio_data = [
+            ["Tr1 (P6 -> H6)", f"{Fraction(R1).limit_denominator()}", R1],
+            ["Tr2 (P6 -> H5,H6)", f"{Fraction(R2).limit_denominator()}", R2],
+            ["Tr3 (P6 -> H4,H5,H6)", f"{Fraction(R3).limit_denominator()}", R3],
+        ]
+        f.write(tabulate(ratio_data,
+                         headers=["Trail", "Ratio (fraction)", "Ratio (decimal)"],
+                         tablefmt="grid"))
 
 # Call main function
 if __name__ == "__main__":
