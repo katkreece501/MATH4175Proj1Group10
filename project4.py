@@ -31,23 +31,21 @@ def construct_ddt(sbox: dict, l: int) -> list:
 #        predicted_diff: the expected difference at the target bits
 #        bit_mask: bitmask selecting which output bits the trail targets
 # Output: list of right 4-tuples
-def filter_right_tuples(tuples: list, predicted_diff: int, bit_mask: int) -> list:
+def filter_right_tuples(tuples: list) -> list:
     right = []
     for x, x_star, y, y_star in tuples:
-        output_diff = y ^ y_star
-        if (output_diff & bit_mask) == predicted_diff:
+        if ((y >> 3) == (y_star >> 3)):
             right.append({
                 "x":      format(x,      "06b"),
                 "x_star": format(x_star, "06b"),
                 "y":      format(y,      "06b"),
-                "y_star": format(y_star, "06b"),
-                "y^y*":   format(output_diff, "06b"),
+                "y_star": format(y_star, "06b")
             })
     return right
 
 def format_tuple_table(right_list):
-        rows = [[d["x"], d["x_star"], d["y"], d["y_star"], d["y^y*"]] for d in right_list]
-        return tabulate(rows, headers=["x", "x*", "y", "y*", "y^y*"], tablefmt="grid")
+    rows = [[d["x"], d["x_star"], d["y"], d["y_star"]] for d in right_list]
+    return tabulate(rows, headers=["x", "x*", "y", "y*"], tablefmt="grid")
 
 # Helper function to get counts for each key guess
 def run_counter(right_tuples, sbox_inv, expected_u4_diff):
@@ -144,12 +142,12 @@ def main():
     # Tr2: S22 output diff = 001 H5,H6 bits = 01
     # Tr3: S22 output diff = 001 H4,H5,H6 bits = 001
     PRED_TR1 = 0b000001
-    PRED_TR2 = 0b000001
-    PRED_TR3 = 0b000001
+    PRED_TR2 = 0b000011
+    PRED_TR3 = 0b000111
 
-    right_tr1 = filter_right_tuples(raw_tuples, PRED_TR1, MASK_TR1)
-    right_tr2 = filter_right_tuples(raw_tuples, PRED_TR2, MASK_TR2)
-    right_tr3 = filter_right_tuples(raw_tuples, PRED_TR3, MASK_TR3)
+    # Right tuples are the same for all trails, since all 
+    # have output differences only in the last 3 bits
+    right_tuples = filter_right_tuples(raw_tuples)
 
     with open("Project4.txt", "a") as f:
         f.write("\n\nPart 4: Filtering for Right 4-Tuples\n\n")
@@ -161,34 +159,19 @@ def main():
         ]
         f.write(tabulate(all_rows, headers=["x","x*","y","y*","y^y*"], tablefmt="grid"))
 
-        f.write("\n\nRight 4-tuples for Tr1 (target: H6, mask=000001, predicted diff=000001):\n")
-        f.write(format_tuple_table(right_tr1) if right_tr1 else "None found.\n")
-
-        f.write("\n\nRight 4-tuples for Tr2 (target: H5,H6, mask=000011, predicted diff=000001):\n")
-        f.write(format_tuple_table(right_tr2) if right_tr2 else "None found.\n")
-
-        f.write("\n\nRight 4-tuples for Tr3 (target: H4,H5,H6, mask=000111, predicted diff=000001):\n")
-        f.write(format_tuple_table(right_tr3) if right_tr3 else "None found.\n")
-
-        # Pick the best single right 4-tuple for each trail
-        selected = [
-            ("Tr1", right_tr1[-1]),
-            ("Tr2", right_tr2[-1]),
-            ("Tr3", right_tr3[0]),
-        ]
-        f.write("\n\nSelected Right 4-Tuples (one per trail):\n")
-        sel_rows = [[trail, d["x"], d["x_star"], d["y"], d["y_star"], d["y^y*"]]
-                    for trail, d in selected]
-        f.write(tabulate(sel_rows, headers=["Trail","x","x*","y","y*","y^y*"], tablefmt="grid"))
+        f.write("\n\nRight 4-tuples:\n")
+        f.write(format_tuple_table(right_tuples) if right_tuples else "None found.\n")
 
     # Part 5: Subkey recovery for the last round
     sbox_inv = {v: k for k, v in sbox.items()}
-    EXPECTED_U4_DIFF = 0b001 # The output of S22/input of S32 is 001 for all trails
+    EXPECTED_U4_DIFF_TR1 = 0b000001
+    EXPECTED_U4_DIFF_TR2 = 0b000011
+    EXPECTED_U4_DIFF_TR3 = 0b000111
 
     # Pass the correct arguments: (tuples, inverse_sbox, target_difference)
-    c1 = run_counter(right_tr1, sbox_inv, EXPECTED_U4_DIFF)
-    c2 = run_counter(right_tr2, sbox_inv, EXPECTED_U4_DIFF)
-    c3 = run_counter(right_tr3, sbox_inv, EXPECTED_U4_DIFF)
+    c1 = run_counter(right_tuples, sbox_inv, EXPECTED_U4_DIFF_TR1)
+    c2 = run_counter(right_tuples, sbox_inv, EXPECTED_U4_DIFF_TR2)
+    c3 = run_counter(right_tuples, sbox_inv, EXPECTED_U4_DIFF_TR3)
 
     with open("Project4.txt", "a") as f:
         f.write("\n\nPart 5: Weighted Cryptanalysis\n")
@@ -216,7 +199,7 @@ def main():
         max_c = max(final_scores.values())
         best_keys = [k for k, v in final_scores.items() if v == max_c]
         f.write(f"\n\n(e) Conclusion:\n")
-        f.write(f"Tie between keys: {', '.join(format(k, '03b') for k in best_keys)}\n")
+        f.write(f"Last 3 bits of K4: {', '.join(format(k, '03b') for k in best_keys)}\n")
 
 # Call main function
 if __name__ == "__main__":
