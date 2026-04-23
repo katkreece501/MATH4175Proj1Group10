@@ -132,19 +132,6 @@ def main():
         (0b011010, 0b011011, 0b101001, 0b101000),
     ]
 
-    # Bit masks for the target output bits
-    MASK_TR1 = 0b000001
-    MASK_TR2 = 0b000011
-    MASK_TR3 = 0b000111
-
-    # Predicted output differences at the target bits from each trail's endpoint
-    # Tr1: S22 output diff = 001 H6 bit = 1
-    # Tr2: S22 output diff = 001 H5,H6 bits = 01
-    # Tr3: S22 output diff = 001 H4,H5,H6 bits = 001
-    PRED_TR1 = 0b000001
-    PRED_TR2 = 0b000011
-    PRED_TR3 = 0b000111
-
     # Right tuples are the same for all trails, since all 
     # have output differences only in the last 3 bits
     right_tuples = filter_right_tuples(raw_tuples)
