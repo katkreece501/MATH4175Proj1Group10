@@ -49,11 +49,37 @@ def format_tuple_table(right_list):
         rows = [[d["x"], d["x_star"], d["y"], d["y_star"], d["y^y*"]] for d in right_list]
         return tabulate(rows, headers=["x", "x*", "y", "y*", "y^y*"], tablefmt="grid")
 
+# Helper function to get counts for each key guess
+def run_counter(right_tuples, sbox_inv, expected_u4_diff):
+    counts = {k: 0 for k in range(8)}
+    
+    for tup in right_tuples:
+        # 1. Get the 3 bits of ciphertext that entered S32
+        y_int  = int(tup["y"], 2) & 0b111
+        ys_int = int(tup["y_star"], 2) & 0b111
+        
+        for k in range(8):
+            # 2. XOR with our key guess (v = y ^ k)
+            v      = y_int  ^ k
+            v_star = ys_int ^ k
+            
+            # 3. Use inverse S-box to go back to the S-box input (u)
+            u      = sbox_inv[v]
+            u_star = sbox_inv[v_star]
+            
+            # 4. Check if the input difference matches our trail's prediction
+            if (u ^ u_star) == expected_u4_diff:
+                counts[k] += 1
+    
+    return counts
+
 def main():
     # S-Box definition:
     # Input:  0, 1, 2, 3, 4, 5, 6, 7
     # Output: 6, 5, 1, 0, 3, 2, 7, 4
     sbox = {0: 6, 1: 5, 2: 1, 3: 0, 4: 3, 5: 2, 6: 7, 7: 4}
+    # Add inverse S-box
+    sbox_inv = {v: k for k, v in sbox.items()}
 
     # Set S-box bit length
     l = 3
@@ -154,6 +180,43 @@ def main():
         sel_rows = [[trail, d["x"], d["x_star"], d["y"], d["y_star"], d["y^y*"]]
                     for trail, d in selected]
         f.write(tabulate(sel_rows, headers=["Trail","x","x*","y","y*","y^y*"], tablefmt="grid"))
+
+    # Part 5: Subkey recovery for the last round
+    sbox_inv = {v: k for k, v in sbox.items()}
+    EXPECTED_U4_DIFF = 0b001 # The output of S22/input of S32 is 001 for all trails
+
+    # Pass the correct arguments: (tuples, inverse_sbox, target_difference)
+    c1 = run_counter(right_tr1, sbox_inv, EXPECTED_U4_DIFF)
+    c2 = run_counter(right_tr2, sbox_inv, EXPECTED_U4_DIFF)
+    c3 = run_counter(right_tr3, sbox_inv, EXPECTED_U4_DIFF)
+
+    with open("Project4.txt", "a") as f:
+        f.write("\n\nPart 5: Weighted Cryptanalysis\n")
+
+        trails = [("a", "Tr1", c1), ("b", "Tr2", c2), ("c", "Tr3", c3)]
+        for label, name, counts in trails:
+            f.write(f"\n({label}) Counter c{label} for Trail {name}:\n")
+            rows = [[k, format(k, "03b"), counts[k]] for k in range(8)]
+            f.write(tabulate(rows, headers=["Key", "Binary", f"c{label}"], tablefmt="grid") + "\n")
+
+        # (d) Weighted average C = R1*c1 + R2*c2 + R3*c3
+        weighted_results = []
+        final_scores = {}
+        for k in range(8):
+            C = (R1 * c1[k]) + (R2 * c2[k]) + (R3 * c3[k])
+            final_scores[k] = C
+            weighted_results.append([k, format(k, "03b"), c1[k], c2[k], c3[k], f"{C:.6f}"])
+
+        f.write("\n(d) Weighted Average Counts C:\n")
+        f.write(tabulate(weighted_results,
+                        headers=["Key", "Binary", "c1", "c2", "c3", "Count C"],
+                        tablefmt="grid"))
+
+        # (e) Conclusion
+        max_c = max(final_scores.values())
+        best_keys = [k for k, v in final_scores.items() if v == max_c]
+        f.write(f"\n\n(e) Conclusion:\n")
+        f.write(f"Tie between keys: {', '.join(format(k, '03b') for k in best_keys)}\n")
 
 # Call main function
 if __name__ == "__main__":
