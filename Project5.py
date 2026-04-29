@@ -1,3 +1,7 @@
+# Participating students:
+# Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
+
+# python3 -m pip install tabulate
 from tabulate import tabulate
 
 def to_matrix(byte_list):
@@ -58,6 +62,13 @@ def next_key(key_matrix, rcon):
 
     return [[W4[r], W5[r], W6[r], W7[r]] for r in range(4)]
 
+def sub_bytes(matrix):
+    result = [[0]*4 for _ in range(4)]
+    for row in range(4):
+        for col in range(4):
+            result[row][col] = substitute(matrix[row][col])
+    return result
+
 def fmt_matrix(m):
             return tabulate([[f"{x:02X}" for x in row] for row in m], tablefmt="grid")
 
@@ -69,24 +80,30 @@ def main():
     msg_matrix = to_matrix(plaintext)
     key_matrix = to_matrix(key0)
     key1_matrix = next_key(key_matrix, rcon=0x01)
-    result     = xor_matrix(msg_matrix, key_matrix)
+    after_xor = xor_matrix(msg_matrix, key_matrix)
+    after_sub = sub_bytes(after_xor)
 
     with open("Project5.txt", "w") as f:
         f.write(f"Project 5: Cryptography MATH 4175\n")
         f.write(f"Participating Students:\n")
-        f.write(f"Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran\n\n")
+        f.write(f"Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran\n")
+        
+        f.write(f"\nQuestions 1-2:\n\n")
         f.write(f"Selected Plaintext is 49 20 6E 65 65 64 20 61 6E 20 41 2B 20 70 6C 7A\n\n")
         f.write(f"Selected Key0 is 45 6E 63 72 79 70 74 20 6D 79 20 6D 61 72 6B 73\n\n")
         f.write(f"Selected Key1 is 04 11 EC 9D 7D 61 98 BD 10 18 B8 D0 71 6A D3 A3\n\n")
-
         f.write("Plaintext Matrix Notation:\n")
         f.write(fmt_matrix(msg_matrix))
         f.write("\n\nKey (K0) Matrix Notation:\n")
         f.write(fmt_matrix(key_matrix))
         f.write("\n\nKey (K1) Matrix Notation:\n")
         f.write(fmt_matrix(key1_matrix))
-        f.write("\n\nAfter XOR (AddRoundKey):\n")
-        f.write(fmt_matrix(result))
+
+        f.write("\n\nQuestion 3:\n\n")
+        f.write("3a. After XOR (AddRoundKey):\n")
+        f.write(fmt_matrix(after_xor))
+        f.write("\n\n3b. After SubBytes:\n")
+        f.write(fmt_matrix(after_sub))
 
 if __name__ == "__main__":
     main()

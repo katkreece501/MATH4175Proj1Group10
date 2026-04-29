@@ -2,6 +2,8 @@ Project 5: Cryptography MATH 4175
 Participating Students:
 Trisha Bajpai, Tommy Dalessio, Kathleen Reece, Theo Tran
 
+Questions 1-2:
+
 Selected Plaintext is 49 20 6E 65 65 64 20 61 6E 20 41 2B 20 70 6C 7A
 
 Selected Key0 is 45 6E 63 72 79 70 74 20 6D 79 20 6D 61 72 6B 73
@@ -41,7 +43,9 @@ Key (K1) Matrix Notation:
 | 9D | BD | D0 | A3 |
 +----+----+----+----+
 
-After XOR (AddRoundKey):
+Question 3:
+
+3a. After XOR (AddRoundKey):
 +----+----+----+----+
 | 0C | 1C | 03 | 41 |
 +----+----+----+----+
@@ -50,4 +54,15 @@ After XOR (AddRoundKey):
 | 0D | 54 | 61 | 07 |
 +----+----+----+----+
 | 17 | 41 | 46 | 09 |
++----+----+----+----+
+
+3b. After SubBytes:
++----+----+----+----+
+| FE | 9C | 7B | 83 |
++----+----+----+----+
+| 2F | FA | CB | 77 |
++----+----+----+----+
+| D7 | 20 | EF | C5 |
++----+----+----+----+
+| F0 | 83 | 5A | 01 |
 +----+----+----+----+
