@@ -5,6 +5,7 @@
 from tabulate import tabulate
 
 def to_matrix(byte_list):
+    """Convert a flat list of 16 bytes into a 4x4 column-major matrix."""
     matrix_byte = [[0]*4 for _ in range(4)]
     for col in range(4):
         for row in range(4):
@@ -12,6 +13,7 @@ def to_matrix(byte_list):
     return matrix_byte
 
 def xor_matrix(a,b):
+    """XOR two 4x4 matrices element-wise."""
     new_matrix = [[0]*4 for _ in range(4)]
     for col in range(4):
         for row in range(4):
@@ -39,12 +41,13 @@ _SBOX_ROWS = [
 ]
 
 def substitute(byte):
+    """Look up a single byte in the AES S-box."""
     row = (byte & 0xF0) >> 4  # high nibble selects the row
     col = (byte & 0x0F)       # low nibble selects the column
     return _SBOX_ROWS[row][col]
 
-
 def next_key(key_matrix, rcon):
+    """Compute the next round key using AES key schedule."""
     # Pull out columns
     W0 = [key_matrix[r][0] for r in range(4)]
     W1 = [key_matrix[r][1] for r in range(4)]
@@ -63,25 +66,39 @@ def next_key(key_matrix, rcon):
     return [[W4[r], W5[r], W6[r], W7[r]] for r in range(4)]
 
 def sub_bytes(matrix):
+    """Apply the AES S-box substitution to every byte in the 4x4 matrix."""
     result = [[0]*4 for _ in range(4)]
     for row in range(4):
         for col in range(4):
             result[row][col] = substitute(matrix[row][col])
     return result
 
+def shift_rows(matrix):
+    result = [[0]*4 for _ in range(4)]
+    for row in range(4):
+        for col in range(4):
+            # Each row is cyclically shifted left by 'row' positions
+            result[row][col] = matrix[row][(col + row) % 4]
+    return result
+
 def fmt_matrix(m):
-            return tabulate([[f"{x:02X}" for x in row] for row in m], tablefmt="grid")
+    """Format a 4x4 matrix as a nice grid with hex values."""
+    return tabulate([[f"{x:02X}" for x in row] for row in m], tablefmt="grid")
 
 def main():
     plaintext = [0x49, 0x20, 0x6E, 0x65, 0x65, 0x64, 0x20, 0x61,
                  0x6E, 0x20, 0x41, 0x2B, 0x20, 0x70, 0x6C, 0x7A]
     key0 = [0x45, 0x6E, 0x63, 0x72, 0x79, 0x70, 0x74, 0x20,
            0x6D, 0x79, 0x20, 0x6D, 0x61, 0x72, 0x6B, 0x73]
-    msg_matrix = to_matrix(plaintext)
-    key_matrix = to_matrix(key0)
+
+    msg_matrix  = to_matrix(plaintext)
+    key_matrix  = to_matrix(key0)
     key1_matrix = next_key(key_matrix, rcon=0x01)
-    after_xor = xor_matrix(msg_matrix, key_matrix)
-    after_sub = sub_bytes(after_xor)
+
+    # Round 1 steps
+    after_xor   = xor_matrix(msg_matrix, key_matrix)   # 3a. AddRoundKey
+    after_sub   = sub_bytes(after_xor)                  # 3b. SubBytes
+    after_shift = shift_rows(after_sub)                 # 3c. ShiftRows
 
     with open("Project5.txt", "w") as f:
         f.write(f"Project 5: Cryptography MATH 4175\n")
@@ -104,6 +121,8 @@ def main():
         f.write(fmt_matrix(after_xor))
         f.write("\n\n3b. After SubBytes:\n")
         f.write(fmt_matrix(after_sub))
+        f.write("\n\n3c. After ShiftRows:\n")
+        f.write(fmt_matrix(after_shift))
 
 if __name__ == "__main__":
     main()
