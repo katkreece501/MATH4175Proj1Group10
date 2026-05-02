@@ -3,6 +3,7 @@
 
 # python3 -m pip install tabulate
 from tabulate import tabulate
+import BitVector 
 
 def to_matrix(byte_list):
     """Convert a flat list of 16 bytes into a 4x4 column-major matrix."""
@@ -74,11 +75,36 @@ def sub_bytes(matrix):
     return result
 
 def shift_rows(matrix):
+    """Shift each row in the 4x4 matrix row index place to the left"""
     result = [[0]*4 for _ in range(4)]
     for row in range(4):
         for col in range(4):
             # Each row is cyclically shifted left by 'row' positions
             result[row][col] = matrix[row][(col + row) % 4]
+    return result
+
+def mix_columns(matrix):
+    """Multiplies the 4x4 matrix by the D matrix, and reduces appropriately"""
+    result = [[0]*4 for _ in range(4)]
+    D = [[0x02, 0x03, 0x01, 0x01],
+        [0x01, 0x02, 0x03, 0x01],
+        [0x01, 0x01, 0x02, 0x03],
+        [0x03, 0x01, 0x01, 0x02]]
+    # Polynomial we mod by, represented as a binary string
+    mod =  BitVector.BitVector(bitstring = "100011011")
+    # Loop through each element in each matrix
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                # Multiply values in each row/col pair, and XOR sum
+                row_bits = BitVector.BitVector(intVal = D[i][k], size = 8)
+                col_bits = BitVector.BitVector(intVal = matrix[k][j], size = 8)
+                result[i][j] ^= int(row_bits.gf_multiply(col_bits))
+            # Reduce each entry to be within field specified by mod
+            element = BitVector.BitVector(intVal = result[i][j])
+            # Note gf_divide_by_modulus returns a (quotient, remainder) tuple
+            q_r = element.gf_divide_by_modulus(mod, 8)
+            result[i][j] = int(q_r[1])
     return result
 
 def fmt_matrix(m):
@@ -96,9 +122,11 @@ def main():
     key1_matrix = next_key(key_matrix, rcon=0x01)
 
     # Round 1 steps
-    after_xor   = xor_matrix(msg_matrix, key_matrix)   # 3a. AddRoundKey
+    after_xor   = xor_matrix(msg_matrix, key_matrix)   # 3a. AddRoundKey K0
     after_sub   = sub_bytes(after_xor)                  # 3b. SubBytes
     after_shift = shift_rows(after_sub)                 # 3c. ShiftRows
+    after_mix = mix_columns(after_shift)                # 3d. MixColumns
+    after_xor_2 = xor_matrix(after_mix, key1_matrix)    # 3e. AddRoundKey K1
 
     with open("Project5.txt", "w") as f:
         f.write(f"Project 5: Cryptography MATH 4175\n")
@@ -117,12 +145,16 @@ def main():
         f.write(fmt_matrix(key1_matrix))
 
         f.write("\n\nQuestion 3:\n\n")
-        f.write("3a. After XOR (AddRoundKey):\n")
+        f.write("3a. After XOR (AddRoundKey) K0:\n")
         f.write(fmt_matrix(after_xor))
         f.write("\n\n3b. After SubBytes:\n")
         f.write(fmt_matrix(after_sub))
         f.write("\n\n3c. After ShiftRows:\n")
         f.write(fmt_matrix(after_shift))
+        f.write("\n\n3d. After MixColumns:\n")
+        f.write(fmt_matrix(after_mix))
+        f.write("\n\n3e. After After XOR (AddRoundKey) K1:\n")
+        f.write(fmt_matrix(after_xor_2))
 
 if __name__ == "__main__":
     main()
