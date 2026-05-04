@@ -89,7 +89,7 @@ Question 3:
 | 0E | 4A | 30 | 25 |
 +----+----+----+----+
 
-3e. After After XOR (AddRoundKey) K1:
+3e. After XOR (AddRoundKey) K1:
 +----+----+----+----+
 | 18 | 2D | 2B | 67 |
 +----+----+----+----+

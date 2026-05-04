@@ -153,7 +153,7 @@ def main():
         f.write(fmt_matrix(after_shift))
         f.write("\n\n3d. After MixColumns:\n")
         f.write(fmt_matrix(after_mix))
-        f.write("\n\n3e. After After XOR (AddRoundKey) K1:\n")
+        f.write("\n\n3e. After XOR (AddRoundKey) K1:\n")
         f.write(fmt_matrix(after_xor_2))
 
 if __name__ == "__main__":
